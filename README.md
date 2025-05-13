@@ -8,7 +8,14 @@
 >
 > By using this script, you acknowledge that you're using it solely for educational purposes and assume all responsibility for any consequences of using this script.
 
-This script automates the process of signing up for a Snowflake account using Playwright for browser automation. The default configuration selects the "Business Critical" edition of Snowflake and AWS as the cloud provider, but these settings can be customized.
+This script automates the process of signing up for a Snowflake account using Playwright for browser automation. The script can be configured to select different Snowflake editions (Standard, Enterprise, Business Critical) and cloud providers (AWS, Azure, GCP).
+
+## Key Features
+
+- **Configuration-based**: No hardcoded personal information
+- **Multiple input methods**: Command-line, config file, environment variables, or interactive prompts
+- **Educational disclaimer**: Requires acknowledgment of terms before execution
+- **Flexible edition selection**: Handles Snowflake's UI for different edition options
 
 ## Requirements
 
@@ -112,6 +119,16 @@ You can use the `--save-config` flag to save your command-line arguments to a co
 snowflake-signup --first-name "John" --last-name "Doe" --email "john.doe@example.com" --save-config
 ```
 
+### Edition Selection
+
+The script handles Snowflake's unique UI for edition selection:
+
+- **Business Critical**: Handles the combined "Business CriticalEnterprise" text in the UI
+- **Enterprise**: Selects the Enterprise option
+- **Standard**: Selects the Standard option
+
+If an unrecognized edition is specified, the script will default to Business Critical with a warning message.
+
 ### Command-line Options
 
 - `--first-name`: First name for the signup form
@@ -119,7 +136,7 @@ snowflake-signup --first-name "John" --last-name "Doe" --email "john.doe@example
 - `--email`: Email address for the signup form
 - `--company`: Company name for the signup form
 - `--job-title`: Job title for the signup form
-- `--edition`: Snowflake edition (choices: "Standard", "Enterprise", "Business Critical"; default: "Business Critical")
+- `--edition`: Snowflake edition (choices: "Standard", "Enterprise", "Business Critical"; default: "Business Critical"). The script handles Snowflake's specific UI elements for each edition.
 - `--cloud-provider`: Cloud provider (choices: "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform"; default: "Amazon Web Services")
 - `--config-file`: Path to JSON configuration file
 - `--save-config`: Save the provided arguments to a configuration file
@@ -129,11 +146,16 @@ snowflake-signup --first-name "John" --last-name "Doe" --email "john.doe@example
 
 ## Notes
 
-- The script will display a disclaimer and require confirmation before proceeding
-- By default, the script runs with a visible browser. Use the `--headless` flag to run without a visible browser.
-- The script handles cookie consent dialogs, form filling, dropdown selections, and multi-step signup processes.
-- The script assumes the signup flow remains consistent. If Snowflake changes their signup process, the script may need to be updated.
-- All personal information is provided by the user and not hardcoded in the script.
+- The script will display a disclaimer and require explicit confirmation before proceeding
+- A visible browser is required during the CAPTCHA solving phase
+- After running the script for the first time, you can use the saved configuration for subsequent runs
+- The script handles cookie consent dialogs, form filling, dropdown selections, and multi-step signup processes
+- All personal information must be provided by the user through configuration
+- The code has been sanitized to remove any hardcoded personal information
+
+### Disclaimer Confirmation
+
+When running the script, you will be presented with a disclaimer explaining that the tool is for educational purposes only. You must explicitly confirm that you understand and agree to use the tool only for educational purposes by typing "yes" or "y" when prompted.
 
 ## Implementation Details
 

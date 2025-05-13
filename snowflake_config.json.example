@@ -1,0 +1,9 @@
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "company": "Example Inc",
+  "job_title": "Data Engineer",
+  "cloud_provider": "Amazon Web Services",
+  "edition": "Business Critical"
+}

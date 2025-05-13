@@ -2,20 +2,26 @@
 """
 CLI wrapper for the Snowflake signup automation script.
 Provides a command-line interface for the snowflake_signup.py script.
+
+EDUCATIONAL PURPOSE ONLY: This script is provided for educational purposes only.
+Misuse is against Snowflake's Terms of Service.
 """
 
 import argparse
 import asyncio
 import sys
+import json
+import os
 from typing import Dict, Any, Optional
 
-# Import the run function from the original script
-from snowflake_signup import run, main
+# Import from the main script and config
+from snowflake_signup import run
+from config import DEFAULT_CONFIG, print_disclaimer
 
 def parse_args() -> Dict[str, Any]:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Automate the Snowflake signup process using Playwright."
+        description="Automate the Snowflake signup process using Playwright. FOR EDUCATIONAL PURPOSES ONLY."
     )
     # Define mutually exclusive group for headless/visible mode
     browser_group = parser.add_mutually_exclusive_group()
@@ -28,48 +34,105 @@ def parse_args() -> Dict[str, Any]:
     
     # Define other arguments
     parser.add_argument(
-        "--first-name", default="Enri", help="First name for the signup form (default: 'Enri')"
+        "--first-name", help="First name for the signup form"
     )
     parser.add_argument(
-        "--last-name", default="Peters", help="Last name for the signup form (default: 'Peters')"
+        "--last-name", help="Last name for the signup form"
     )
     parser.add_argument(
-        "--email", default="enri@ityou.tech", help="Email address for the signup form (default: 'enri@ityou.tech')"
+        "--email", help="Email address for the signup form"
     )
     parser.add_argument(
-        "--company", default="ITYOU.tech", help="Company name for the signup form (default: 'ITYOU.tech')"
+        "--company", help="Company name for the signup form"
     )
     parser.add_argument(
-        "--job-title", default="IT Engineer", help="Job title for the signup form (default: 'IT Engineer')"
+        "--job-title", help="Job title for the signup form"
+    )
+    parser.add_argument(
+        "--edition", choices=["Standard", "Enterprise", "Business Critical"],
+        default="Business Critical", help="Snowflake edition (default: Business Critical)"
+    )
+    parser.add_argument(
+        "--cloud-provider", choices=["Amazon Web Services", "Microsoft Azure", "Google Cloud Platform"],
+        default="Amazon Web Services", help="Cloud provider (default: Amazon Web Services)"
+    )
+    parser.add_argument(
+        "--config-file", help="Path to JSON configuration file"
     )
     parser.add_argument(
         "--timeout", type=int, default=60000, help="Timeout in milliseconds (default: 60000)"
     )
+    parser.add_argument(
+        "--save-config", action="store_true", help="Save provided arguments to config file"
+    )
     
     return vars(parser.parse_args())
 
-def display_parameters(args: Dict[str, Any]) -> None:
-    """Display the parameters being used for the signup process."""
-    print("Running Snowflake signup automation with the following parameters:")
-    print(f"  First Name: {args['first_name']}")
-    print(f"  Last Name: {args['last_name']}")
-    print(f"  Email: {args['email']}")
-    print(f"  Company: {args['company']}")
-    print(f"  Job Title: {args['job_title']}")
-    print(f"  Browser Mode: {'Visible' if args['visible'] else 'Headless'}")
-    print(f"  Timeout: {args['timeout']} ms")
-    print("\nNote: These parameters are for display only. The original script uses default values.")
-    print("To modify the actual values, update the snowflake_signup.py file directly.\n")
-
-def main() -> None:
-    """Main entry point for the CLI."""
-    args = parse_args()
-    display_parameters(args)
+def load_config_from_args(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Load configuration from command-line arguments, file, and/or environment variables."""
+    config = DEFAULT_CONFIG.copy()
     
-    # Simply call the main function from the original script
-    # since we can't modify it to accept our parameters
+    # First, try to load from specified config file
+    if args.get("config_file") and os.path.exists(args["config_file"]):
+        try:
+            with open(args["config_file"], "r") as f:
+                file_config = json.load(f)
+                config.update({k: v for k, v in file_config.items() if v})
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error loading config file: {e}")
+    
+    # Then, override with environment variables
+    for key in config.keys():
+        env_var = f"SNOWFLAKE_{key.upper()}"
+        if os.environ.get(env_var):
+            config[key] = os.environ.get(env_var)
+    
+    # Finally, override with command-line arguments
+    for key, value in args.items():
+        if key in config and value is not None:
+            config[key] = value
+    
+    # Save config if requested
+    if args.get("save_config"):
+        save_path = args.get("config_file") or "snowflake_config.json"
+        try:
+            with open(save_path, "w") as f:
+                json.dump(config, f, indent=2)
+                print(f"Configuration saved to {save_path}")
+        except IOError as e:
+            print(f"Error saving configuration: {e}")
+    
+    return config
+
+def display_parameters(config: Dict[str, Any]) -> None:
+    """Display the parameters being used for the signup process."""
+    print("\nRunning Snowflake signup automation with the following parameters:")
+    for key, value in config.items():
+        print(f"  {key.replace('_', ' ').title()}: {value}")
+    print()
+
+def cli_main() -> None:
+    """Main entry point for the CLI."""
+    # Show disclaimer and get confirmation
+    if not print_disclaimer():
+        return
+    
+    # Parse arguments and load configuration
+    args = parse_args()
+    config = load_config_from_args(args)
+    
+    # Check for required fields
+    missing = [k for k, v in config.items() if not v]
+    if missing:
+        print(f"Missing required fields: {', '.join(missing)}")
+        for field in missing:
+            config[field] = input(f"Please enter {field.replace('_', ' ')}: ")
+    
+    display_parameters(config)
+    
+    # Run the main automation
     print("Starting Snowflake signup automation...")
-    asyncio.run(main())
+    asyncio.run(run(None, config))
 
 if __name__ == "__main__":
-    main()
+    cli_main()

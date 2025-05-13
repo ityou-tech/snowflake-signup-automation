@@ -151,3 +151,7 @@ cython_debug/
 
 # Project specific
 uv.lock
+
+# Configuration files with personal information
+snowflake_config.json
+.snowflake_config.json

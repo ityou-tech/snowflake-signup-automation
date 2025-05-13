@@ -1,6 +1,14 @@
 # Snowflake Signup Automation
 
-This script automates the process of signing up for a Snowflake account using Playwright for browser automation. The automation selects the "Business Critical" edition of Snowflake and AWS as the cloud provider.
+> **IMPORTANT: FOR EDUCATIONAL PURPOSES ONLY**
+>
+> This script is provided for educational purposes only. The script demonstrates browser automation techniques and should only be used for legitimate learning purposes.
+>
+> Any misuse of this script is strictly against the Snowflake Self-Service On Demand Terms of Service (https://www.snowflake.com/en/legal/terms-of-service/self-service-on-demand-terms-of-service/).
+>
+> By using this script, you acknowledge that you're using it solely for educational purposes and assume all responsibility for any consequences of using this script.
+
+This script automates the process of signing up for a Snowflake account using Playwright for browser automation. The default configuration selects the "Business Critical" edition of Snowflake and AWS as the cloud provider, but these settings can be customized.
 
 ## Requirements
 
@@ -75,25 +83,57 @@ snowflake-signup --first-name "John" --last-name "Doe" --email "john.doe@example
 snowflake-signup --headless
 ```
 
-Note: Command-line parameters are for display purposes only. To modify the actual values used in the automation, you need to edit the `snowflake_signup.py` file directly.
+### Configuration
+
+The script now uses a configuration system that allows you to specify parameters in multiple ways:
+
+1. **Command-line arguments**: Provide parameters directly when running the script
+2. **Configuration file**: Use a JSON file to store configuration
+3. **Environment variables**: Set `SNOWFLAKE_FIRST_NAME`, `SNOWFLAKE_EMAIL`, etc.
+4. **Interactive prompts**: If required fields are missing, the script will prompt for input
+
+A sample configuration file `snowflake_config.json.example` is provided. You can copy this to `snowflake_config.json` and modify it with your details:
+
+```json
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john.doe@example.com",
+  "company": "Example Inc",
+  "job_title": "Data Engineer",
+  "cloud_provider": "Amazon Web Services",
+  "edition": "Business Critical"
+}
+```
+
+You can use the `--save-config` flag to save your command-line arguments to a config file:
+
+```bash
+snowflake-signup --first-name "John" --last-name "Doe" --email "john.doe@example.com" --save-config
+```
 
 ### Command-line Options
 
-- `--first-name`: First name for the signup form (default: "Enri")
-- `--last-name`: Last name for the signup form (default: "Peters")
-- `--email`: Email address for the signup form (default: "enri@ityou.tech")
-- `--company`: Company name for the signup form (default: "ITYOU.TECH")
-- `--job-title`: Job title for the signup form (default: "IT Engineer")
+- `--first-name`: First name for the signup form
+- `--last-name`: Last name for the signup form
+- `--email`: Email address for the signup form
+- `--company`: Company name for the signup form
+- `--job-title`: Job title for the signup form
+- `--edition`: Snowflake edition (choices: "Standard", "Enterprise", "Business Critical"; default: "Business Critical")
+- `--cloud-provider`: Cloud provider (choices: "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform"; default: "Amazon Web Services")
+- `--config-file`: Path to JSON configuration file
+- `--save-config`: Save the provided arguments to a configuration file
 - `--visible`: Run with a visible browser window (default behavior)
 - `--headless`: Run without a visible browser window (mutually exclusive with --visible)
 - `--timeout`: Set timeout in milliseconds (default: 60000, i.e., 1 minute)
 
 ## Notes
 
-- The script will take a screenshot of the completed signup process and save it as `snowflake_signup_complete.png`
+- The script will display a disclaimer and require confirmation before proceeding
 - By default, the script runs with a visible browser. Use the `--headless` flag to run without a visible browser.
 - The script handles cookie consent dialogs, form filling, dropdown selections, and multi-step signup processes.
 - The script assumes the signup flow remains consistent. If Snowflake changes their signup process, the script may need to be updated.
+- All personal information is provided by the user and not hardcoded in the script.
 
 ## Implementation Details
 

@@ -37,6 +37,9 @@ chmod +x setup-with-uv.sh
 
 # Run the setup script
 ./setup-with-uv.sh
+
+# Activate the virtual environment
+source .venv/bin/activate
 ```
 
 The script will:
@@ -166,37 +169,6 @@ When running the script, you will be presented with a disclaimer explaining that
 - Provides detailed logging of the automation process
 
 ## Additional Utility Scripts
-
-### Demo Script
-
-Run a demo of the Snowflake signup automation with test credentials:
-
-```bash
-# Run with visible browser (default)
-run-demo             
-
-# Run in headless mode
-run-demo --headless  
-
-# Explicitly run with visible browser
-run-demo --visible   
-
-# Set custom timeout (2 minutes)
-run-demo --timeout 120000  
-
-# Use a custom test data file
-run-demo --data-file custom_test_data.json
-```
-
-This script will run the signup process using sample test credentials and select the "Business Critical" edition.
-
-#### Troubleshooting Demo Script
-
-If you encounter issues with the demo:
-
-1. Try increasing the timeout: `run-demo --timeout 120000`
-2. Run with the visible browser to see what's happening: `run-demo --visible`
-3. Check the screenshots saved during execution for debugging
 
 ### Test Data Generator
 

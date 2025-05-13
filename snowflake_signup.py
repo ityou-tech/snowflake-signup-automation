@@ -122,13 +122,17 @@ async def run(playwright: Playwright, config=None) -> None:
 
 async def main() -> None:
     """Main entry point for the script"""
-    # Show disclaimer and get confirmation
-    if not print_disclaimer():
+    try:
+        # Show disclaimer and get confirmation
+        if not print_disclaimer():
+            return
+        
+        config = load_config()
+        async with async_playwright() as playwright:
+            await run(playwright, config)
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user. Exiting.")
         return
-    
-    config = load_config()
-    async with async_playwright() as playwright:
-        await run(playwright, config)
 
 
 if __name__ == "__main__":

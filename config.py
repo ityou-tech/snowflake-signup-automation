@@ -40,9 +40,13 @@ def print_disclaimer():
     print(DISCLAIMER)
     print("=" * 80 + "\n")
     
-    # Ask for confirmation
-    response = input("Do you understand and agree to use this ONLY for educational purposes? (yes/no): ")
-    if response.lower() not in ["yes", "y"]:
-        print("Exiting as agreement was not confirmed.")
+    # Ask for confirmation with keyboard interrupt handling
+    try:
+        response = input("Do you understand and agree to use this ONLY for educational purposes? (yes/no): ")
+        if response.lower() not in ["yes", "y"]:
+            print("Exiting as agreement was not confirmed.")
+            return False
+        return True
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user. Exiting.")
         return False
-    return True

@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "snowflake-signup"
 version = "0.1.0"
@@ -19,20 +23,12 @@ dev = [
 ]
 
 [project.scripts]
-snowflake-signup = "snowflake_signup_cli:main"
+snowflake-signup = "snowflake_signup_cli:cli_main"
 generate-test-data = "snowflake_util.generator:main"
-run-demo = "snowflake_util.demo:main"
 batch-signup = "snowflake_util.batch:main"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [tool.pytest]
 testpaths = ["tests"]
 
-[tool.uv.resolution]
-strategy = "consistent"
-
-[tool.uv.package]
-include = ["snowflake_signup*.py", "snowflake_util/"]
+[tool.hatch.build]
+packages = ["snowflake_signup*.py", "snowflake_util"]

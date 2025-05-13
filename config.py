@@ -12,7 +12,7 @@ DEFAULT_CONFIG = {
     "company": "",
     "job_title": "",
     "cloud_provider": "Amazon Web Services",  # Options: "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform"
-    "edition": "Business Critical"  # Options: "Standard", "Enterprise", "Business Critical"
+    "edition": "Business Critical",  # Options: "Standard", "Enterprise", "Business Critical"
 }
 
 # Educational purpose disclaimer
@@ -34,15 +34,18 @@ By using this script, you acknowledge:
 The author(s) of this script are not responsible for any misuse or resulting consequences.
 """
 
+
 def print_disclaimer():
     """Print the educational purpose disclaimer."""
     print("\n" + "=" * 80)
     print(DISCLAIMER)
     print("=" * 80 + "\n")
-    
+
     # Ask for confirmation with keyboard interrupt handling
     try:
-        response = input("Do you understand and agree to use this ONLY for educational purposes? (yes/no): ")
+        response = input(
+            "Do you understand and agree to use this ONLY for educational purposes? (yes/no): "
+        )
         if response.lower() not in ["yes", "y"]:
             print("Exiting as agreement was not confirmed.")
             return False

@@ -17,7 +17,7 @@ from config import DEFAULT_CONFIG, print_disclaimer
 def load_config():
     """Load configuration from file or environment variables"""
     config_file = os.environ.get("SNOWFLAKE_CONFIG_FILE", "snowflake_config.json")
-    
+
     # First check if config file exists
     if os.path.exists(config_file):
         try:
@@ -25,22 +25,24 @@ def load_config():
                 return json.load(f)
         except (json.JSONDecodeError, IOError) as e:
             print(f"Error loading config file: {e}")
-    
+
     # If no file, get from environment or prompt user
     config = DEFAULT_CONFIG.copy()
-    
+
     for key in config.keys():
         env_var = f"SNOWFLAKE_{key.upper()}"
         if os.environ.get(env_var):
             config[key] = os.environ.get(env_var)
-    
+
     # If config still has empty values, prompt user
-    missing_values = [k for k, v in config.items() if not v and k not in ["cloud_provider", "edition"]]
+    missing_values = [
+        k for k, v in config.items() if not v and k not in ["cloud_provider", "edition"]
+    ]
     if missing_values:
         print("\nPlease provide the following information:")
         for key in missing_values:
             config[key] = input(f"{key.replace('_', ' ').title()}: ")
-    
+
     return config
 
 
@@ -48,7 +50,7 @@ async def run(playwright: Playwright, config=None) -> None:
     """Run the Snowflake signup automation"""
     if config is None:
         config = load_config()
-    
+
     # 🚀 Phase 1: Headful mode to solve CAPTCHA manually
     print("🌐 Launching browser in VISIBLE mode for CAPTCHA...")
     browser = await playwright.chromium.launch(headless=False)
@@ -69,17 +71,19 @@ async def run(playwright: Playwright, config=None) -> None:
     await page.get_by_test_id("companyName-input").fill(config["company"])
     await page.get_by_test_id("jobTitle-input").fill(config["job_title"])
     await page.get_by_test_id("edition-input").click()
-    
+
     # Handle edition selection based on the specific UI text structure
-    if config['edition'] == "Business Critical":
+    if config["edition"] == "Business Critical":
         await page.get_by_text("Business CriticalEnterprise").click()
-    elif config['edition'] == "Enterprise":
+    elif config["edition"] == "Enterprise":
         await page.get_by_text("Enterprise").click()
-    elif config['edition'] == "Standard":
+    elif config["edition"] == "Standard":
         await page.get_by_text("Standard").click()
     else:
         # Default to Business Critical if unrecognized
-        print(f"Warning: Unrecognized edition '{config['edition']}', defaulting to Business Critical")
+        print(
+            f"Warning: Unrecognized edition '{config['edition']}', defaulting to Business Critical"
+        )
         await page.get_by_text("Business CriticalEnterprise").click()
     await page.get_by_role("button", name=config["cloud_provider"]).click()
     await page.get_by_role("checkbox", name="terms-agreement").check()
@@ -126,7 +130,7 @@ async def main() -> None:
         # Show disclaimer and get confirmation
         if not print_disclaimer():
             return
-        
+
         config = load_config()
         async with async_playwright() as playwright:
             await run(playwright, config)

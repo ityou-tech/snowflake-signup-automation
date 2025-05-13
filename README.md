@@ -13,9 +13,8 @@ This script automates the process of signing up for a Snowflake account using Pl
 ## Key Features
 
 - **Configuration-based**: No hardcoded personal information
-- **Multiple input methods**: Command-line, config file, environment variables, or interactive prompts
+- **Multiple input methods**: Command-line, config file or interactive prompts
 - **Educational disclaimer**: Requires acknowledgment of terms before execution
-- **Flexible edition selection**: Handles Snowflake's UI for different edition options
 
 ## Requirements
 
@@ -95,12 +94,11 @@ snowflake-signup --headless
 
 ### Configuration
 
-The script now uses a configuration system that allows you to specify parameters in multiple ways:
+The script uses a configuration system that allows you to specify parameters in multiple ways:
 
 1. **Command-line arguments**: Provide parameters directly when running the script
 2. **Configuration file**: Use a JSON file to store configuration
-3. **Environment variables**: Set `SNOWFLAKE_FIRST_NAME`, `SNOWFLAKE_EMAIL`, etc.
-4. **Interactive prompts**: If required fields are missing, the script will prompt for input
+3. **Interactive prompts**: The script will prompt for input
 
 A sample configuration file `snowflake_config.json.example` is provided. You can copy this to `snowflake_config.json` and modify it with your details:
 
@@ -119,7 +117,15 @@ A sample configuration file `snowflake_config.json.example` is provided. You can
 You can use the `--save-config` flag to save your command-line arguments to a config file:
 
 ```bash
-snowflake-signup --first-name "John" --last-name "Doe" --email "john.doe@example.com" --save-config
+snowflake-signup \
+  --first-name "John" \
+  --last-name "Doe" \
+  --email "john.doe@example.com" \
+  --company "Example Inc" \
+  --job-title "Data Engineer" \
+  --edition "Business Critical" \
+  --cloud-provider "Amazon Web Services" \
+  --save-config
 ```
 
 ### Edition Selection
@@ -150,7 +156,7 @@ If an unrecognized edition is specified, the script will default to Business Cri
 ## Notes
 
 - The script will display a disclaimer and require explicit confirmation before proceeding
-- A visible browser is required during the CAPTCHA solving phase
+- A visible browser is needed to solve the CAPTCHA, but the CAPTCHA may sometimes not appear and be skipped automatically
 - After running the script for the first time, you can use the saved configuration for subsequent runs
 - The script handles cookie consent dialogs, form filling, dropdown selections, and multi-step signup processes
 - All personal information must be provided by the user through configuration
@@ -159,14 +165,6 @@ If an unrecognized edition is specified, the script will default to Business Cri
 ### Disclaimer Confirmation
 
 When running the script, you will be presented with a disclaimer explaining that the tool is for educational purposes only. You must explicitly confirm that you understand and agree to use the tool only for educational purposes by typing "yes" or "y" when prompted.
-
-## Implementation Details
-
-- Uses Playwright's synchronous API for browser automation
-- Implements robust selectors with fallback mechanisms for resilience
-- Handles retry logic for more reliable form interactions
-- Captures screenshots at key steps for debugging purposes
-- Provides detailed logging of the automation process
 
 ## Additional Utility Scripts
 
@@ -212,7 +210,6 @@ The batch processor:
 This project fully supports [uv](https://github.com/astral-sh/uv), a faster Python package installer and resolver:
 
 - All dependency specifications are compatible with uv
-- The project includes uv configuration in pyproject.toml
 - For best performance, we recommend using uv to install dependencies
 
 ### Easy Installation with Setup Script
@@ -257,13 +254,11 @@ uv pip install -e .
 python -m playwright install chromium
 ```
 
-### Configuration
+## Development Dependencies
 
-The uv configuration is specified in `pyproject.toml`:
+This project includes optional development dependencies for testing and code formatting. You can install these using the following command:
 
-```toml
-[tool.uv.resolution]
-strategy = "consistent"
+```bash
+# Install the project with development dependencies using uv
+uv pip install -e ".[dev]"
 ```
-
-This ensures that uv uses a consistent resolution strategy for dependencies, which is important for maintaining compatibility across different environments.
